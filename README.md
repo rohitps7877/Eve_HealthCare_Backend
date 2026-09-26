@@ -157,15 +157,6 @@ The PostgreSQL schema contains:
 - Appointment dates must be in the future, and cancelled or failed bookings do not block a duplicate appointment request.
 - PostgreSQL is the required database for local development and deployment.
 
-## Improvements With More Time
-
-- Add roles and authorization for centre/test administration.
-- Verify webhook signatures and add replay protection beyond transaction-ID deduplication.
-- Add request validation with a schema library and consistent JSON error responses.
-- Add integration tests using an isolated test database, including the full booking and webhook flows.
-- Add environment validation, production configuration, migrations in CI, and structured request logging.
-- Add pagination and filtering for centre and booking listings.
-
 ## Project Layout
 
 ```text
