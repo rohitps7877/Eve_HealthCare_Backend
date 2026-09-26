@@ -1,0 +1,78 @@
+generator client {
+    provider = "prisma-client"
+    output   = "../src/generated/prisma"
+    moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  bookings Booking[]
+}
+
+model DiagnosticTest {
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Float
+  createdAt DateTime @default(now())
+
+  centres  DiagnosticCentre[]
+  bookings Booking[]
+}
+
+model DiagnosticCentre {
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String
+  createdAt DateTime @default(now())
+
+  tests    DiagnosticTest[]
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  testId          Int
+  centreId        Int
+  appointmentDate DateTime
+  amount          Float
+  status          BookingStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+
+  user    User             @relation(fields: [userId], references: [id])
+  test    DiagnosticTest   @relation(fields: [testId], references: [id])
+  centre  DiagnosticCentre @relation(fields: [centreId], references: [id])
+  payment Payment?
+}
+
+enum PaymentStatus {
+  SUCCESS
+  FAILED
+}
+
+model Payment {
+  id            Int           @id @default(autoincrement())
+  bookingId     Int           @unique
+  amount        Float
+  status        PaymentStatus
+  transactionId String        @unique
+  createdAt     DateTime      @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+}
