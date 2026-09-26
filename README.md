@@ -1,6 +1,6 @@
 # EVE Healthcare Backend
 
-A REST API for diagnostic centres, tests, patient bookings, payments, and payment webhooks. The service uses Express, PostgreSQL, Prisma 7, and JWT authentication.
+A REST API for diagnostic centres, tests, patient bookings, payments, and payment webhooks. The service uses Express, PostgreSQL, Prisma 7, JWT authentication, and bcrypt.
 
 ## Run Locally
 
@@ -32,10 +32,16 @@ npx prisma migrate deploy
 Start the API:
 
 ```bash
-npm start
+node src/server.js
 ```
 
-The API runs at `http://localhost:3000`. Check the database connection with `npm run db:check`. Run the tests with `npm test`.
+The API runs at `http://localhost:3000`.
+
+For development with automatic restart:
+
+```bash
+npx nodemon src/server.js
+```
 
 ## API Endpoints
 
@@ -72,7 +78,7 @@ Returns `EVE Healthcare Backend is running`.
 
 ### Diagnostic Centres and Tests
 
-`POST /api/centres/tests`
+`POST /api/centres/tests` requires a bearer token.
 
 ```json
 {
@@ -81,7 +87,7 @@ Returns `EVE Healthcare Backend is running`.
 }
 ```
 
-`POST /api/centres`
+`POST /api/centres` requires a bearer token.
 
 ```json
 {
@@ -90,7 +96,7 @@ Returns `EVE Healthcare Backend is running`.
 }
 ```
 
-`POST /api/centres/:centreId/tests/:testId` connects an existing test to a centre.
+`POST /api/centres/:centreId/tests/:testId` requires a bearer token and connects an existing test to a centre.
 
 `GET /api/centres` lists centres and their available tests.
 
@@ -151,15 +157,18 @@ The PostgreSQL schema contains:
 
 ## Assumptions
 
-- Centre and diagnostic-test management are trusted internal operations and are not role-protected in this version.
+- Centre and diagnostic-test management require an authenticated user, but no separate staff/admin role system is implemented.
 - JWTs expire after one hour and are signed with `JWT_SECRET`.
 - Payment providers send `SUCCESS` or `FAILED` statuses and a stable unique transaction ID.
 - Appointment dates must be in the future, and cancelled or failed bookings do not block a duplicate appointment request.
 - PostgreSQL is the required database for local development and deployment.
+- The payment service is simulated and does not connect to a real payment provider.
 
 ## Improvements With More Time
 
 - Add role-based access control (RBAC) so only authorized staff can manage centres and diagnostic tests.
+- Add rate limiting and retry handling for production use.
+- Add Docker support for easier deployment.
 
 ## Project Layout
 
